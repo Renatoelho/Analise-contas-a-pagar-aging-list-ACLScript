@@ -31,10 +31,10 @@ A decorrência dessa análise terá como resultado as faixas definidas anteriorm
 
 **Despesas do Senado Federal em 2017**
 
-![](print 1)
+![](https://github.com/Renatoelho/Analise-contas-a-pagar-aging-list-ACLScript/blob/master/04-prints/despesas_senado_federal_2017.JPG?raw=true)
 
 **Resultado do Aging list**
 
-![](print 2)
+![](https://github.com/Renatoelho/Analise-contas-a-pagar-aging-list-ACLScript/blob/master/04-prints/resultado_aging_list.JPG?raw=true)
 
 >**Observação:** Todos esses passos efetuados aqui, podem ser aplicados tanto num contas a pagar como também em um contas a receber. Esse tipo de análise é bastante simples de aplicar no dia a dia da empresa, mas muito efetiva porquê da uma visão geral e clara de toda a parte financeira.
