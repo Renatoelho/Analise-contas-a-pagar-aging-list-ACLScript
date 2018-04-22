@@ -1,0 +1,79 @@
+SET SAFETY OFF
+
+COMMENT --- Variáveis úteis para execução dos scripts ---
+COMMENT --- Aqui é inserido o local onde está o arquivo de despesas Ex.:'C:\user\arquivos\databases\' ---
+
+VAR_LOCAL_ARQUIVO = "C:\user\arquivos\databases\"
+
+COMMENT --- Aqui é onde deve ser salvo o resultado Ex.:'C:\user\arquivos\resultsets\' ---
+
+VAR_LOCAL_RESULSET = "C:\user\arquivos\resultsets\"
+
+COMMENT --- Aqui importamos a base de despesas do Senado de 2017 ---
+
+IMPORT DELIMITED TO DESPESAS_SENADO_2017 "DESPESAS_SENADO_2017.fil" FROM "%VAR_LOCAL_ARQUIVO%despesas_senado_federal_2017.txt" 0 SEPARATOR ";" QUALIFIER NONE CONSECUTIVE STARTLINE 1 KEEPTITLE FIELD "DATA" D AT 1 DEC 0 WID 10 PIC "DD/MM/YYYY" AS "" FIELD "FASE" C AT 11 DEC 0 WID 10 PIC "" AS "" FIELD "UG" C AT 21 DEC 0 WID 11 PIC "" AS "" FIELD "DOCUMENTO" C AT 32 DEC 0 WID 12 PIC "" AS "" FIELD "ESPÉCIE" C AT 44 DEC 0 WID 2 PIC "" AS "" FIELD "ELEMENTO_DA_DESPESA" C AT 46 DEC 0 WID 45 PIC "" AS "" FIELD "FAVORECIDO" C AT 91 DEC 0 WID 55 PIC "" AS "" FIELD "VALOR" N AT 146 DEC 2 WID 15 PIC "" AS "" 
+
+COMMENT --- Vou criar uma base só com os atributos que irei utilizar na análise e com valores maiores que 0,00 ---
+
+OPEN DESPESAS_SENADO_2017
+EXTRACT FIELDS DATA VALOR IF VALOR > 0,00 TO BASE_AGING_LIST
+
+COMMENT --- Essa variável será usada para definir a data base da análise ---
+
+VAR_DATABASE = `20170101`
+
+COMMENT --- Vou criar as faixas conforme especificado no arquivo README do GitHub ---
+
+OPEN BASE_AGING_LIST
+DEFINE FIELD AGING_LIST COMPUTED 
+
+"ALiquidações até 30 dias" IF BETWEEN(DATA - VAR_DATABASE;0;30)
+"BLiquidações entre 31 e 60 dias" IF BETWEEN(DATA - VAR_DATABASE;31;60)
+"CLiquidações entre 61 e 90 dias" IF BETWEEN(DATA - VAR_DATABASE;61;90)
+"DLiquidações entre 91 e 120 dias" IF BETWEEN(DATA - VAR_DATABASE;91;120)
+"ELiquidações entre 121 e 150 dias" IF BETWEEN(DATA - VAR_DATABASE;121;150)
+"FLiquidações entre 151 e 180 dias" IF BETWEEN(DATA - VAR_DATABASE;151;180)
+"GLiquidações entre 181 e 240 dias" IF BETWEEN(DATA - VAR_DATABASE;181;240)
+"HLiquidações entre 241 e 300 dias" IF BETWEEN(DATA - VAR_DATABASE;241;300)
+"ILiquidações entre 301 e 360 dias" IF BETWEEN(DATA - VAR_DATABASE;301;360)
+"JLiquidações maiores que 360 dias" IF BETWEEN(DATA - VAR_DATABASE;360;9999)
+"XNão definido"
+
+COMMENT --- Aqui é agrupado os dados para sabermos as quantidades de despesas e o montante de cada faixa ---
+
+OPEN BASE_AGING_LIST
+CLASSIFY ON AGING_LIST SUBTOTAL VALOR TO BASE_AGING_LIST2
+
+COMMENT --- Aqui é totalizado todos os valores para ser criada a linha de totais ---
+
+OPEN BASE_AGING_LIST2
+GROUP
+TOTAL FIELD COUNT 
+TOTAL FIELD VALOR
+END 
+
+COMMENT --- Na descrição de cada faixa foi incluída uma letra na sequência A,B,C...---
+COMMENT --- Para que no momento da consolidação as faixas fiquem na sequência correta ---
+COMMENT --- Vou excluir essa primeira letra para apresentação dos dados ---
+
+OPEN BASE_AGING_LIST2
+EXTRACT FIELDS  ALLTRIM(SUBSTRING(AGING_LIST;2;50)) AS "AGING_LIST" COUNT AS "QTD" COUNT_PERCENTAGE AS "PERCT_QTD"  VALOR AS "MONTANTE" FIELD_PERCENTAGE AS "PERCT_MONTANTE" TO RESULTADO_AGING_LIST  
+EXTRACT "Totais"+BLANKS(44) TOTAL2 100,00 TOTAL3 100,00 TO RESULTADO_AGING_LIST APPEND FIRST 1 
+
+COMMENT --- Abre o resultado final do aging list ---
+
+OPEN RESULTADO_AGING_LIST
+
+COMMENT --- Deleta as bases usadas na análise ---
+
+DELETE FORMAT DESPESAS_SENADO_2017 OK 
+DELETE FORMAT BASE_AGING_LIST OK
+DELETE FORMAT BASE_AGING_LIST2 OK
+
+DELETE "DESPESAS_SENADO_2017.FIL" OK 
+DELETE "BASE_AGING_LIST.FIL" OK
+DELETE "BASE_AGING_LIST2.FIL" OK
+
+COMMENT --- Fim di Script ---
+
+SET SAFETY ON 

@@ -1,0 +1,12 @@
+AGING_LIST|QTD|PERCT_QTD|MONTANTE|PERCT_MONTANTE
+Liquidações até 30 dias|281|4,83|325376253,48|7,07
+Liquidações entre 31 e 60 dias|439|7,55|300416863,65|6,53
+Liquidações entre 61 e 90 dias|504|8,66|320178615,41|6,96
+Liquidações entre 91 e 120 dias|437|7,51|300645727,31|6,53
+Liquidações entre 121 e 150 dias|572|9,83|305839891,14|6,65
+Liquidações entre 151 e 180 dias|493|8,47|490781518,94|10,67
+Liquidações entre 181 e 240 dias|861|14,80|609604323,26|13,25
+Liquidações entre 241 e 300 dias|1100|18,91|876591190,72|19,05
+Liquidações entre 301 e 360 dias|1096|18,84|1066839418,05|23,19
+Liquidações maiores que 360 dias|35|0,60|4316360,80|0,09
+Totais|5818|100,00|4600590162,76|100,00
